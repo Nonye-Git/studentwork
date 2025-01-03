@@ -1,0 +1,417 @@
+---
+title: "Interview Data Analysis"
+author: '36322311'
+date: "2024-09-17"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+
+```
+
+```{r}
+
+library(XML)
+
+#Import data
+
+gono_gender <- read.csv("C:/Users/aneke/Downloads/Surveillance practice/gonoreah diagnosis and rates by gender and age.csv")
+
+Books_xml <- xmlParse("C:/Users/aneke/Downloads/Surveillance practice/15mb.xml")
+
+#convert xml to dataframe
+
+Books_df <- xmlToDataFrame(nodes = getNodeSet(Books_xml, "// record"))
+
+#Print dataframe
+
+#import data
+
+Books <- read.csv("C:/Users/aneke/Downloads/Surveillance practice/Books.csv")
+
+```
+
+```{r}
+# import data
+
+Social_contact <- read.csv("C:/Users/aneke/Downloads/Surveillance practice/Social Contact.csv")
+
+Census <- read.csv("C:/Users/aneke/Downloads/Surveillance practice/Census.csv")
+```
+
+```{r}
+# Create a table
+
+My_table <- data.frame(
+                       ID= c( "mary", "Dan", "John"),
+                       Names= c(" school", "church","market"),
+                       Gender= c("female", "female", "male"))
+# create table
+print(My_table)
+```
+```{r}
+#create a contigency table
+
+Data <- matrix(c(114,115,225, 50,200,250,190,315), nrow=3,byrow=TRUE)
+
+#add row and column names
+
+colnames(Data) <- c("diseased","Not diseased","Total")
+rownames(Data) <- c("exposed", "Not exposed","Total")
+
+
+
+contigency_table <- as.table(Data)
+
+print(contigency_table)
+```
+```{r}
+
+CT<- matrix(c(114,115,50,200), nrow=2, byrow=TRUE)
+col_total <- colSums(CT)
+row_total <- rowSums(CT)
+
+grand_total <- sum(CT)
+
+CT_T <- rbind(cbind(CT,row_total),c(col_total,grand_total))
+
+
+colnames(CT_T) <- c("diseased","Not diseased","Total")
+rownames(CT_T) <- c("exposed", "Not exposed","Total")
+
+print(CT_T)
+
+
+
+```
+#There were 172 patient who were not diagnosed with food poisoning (controls) and 112 patients diagnosed with food poisoning (cases) enrolled into the study. 108 controls had eaten out at a restaurant, while 85 cases had eaten out at a restaurant within the past 2 days (defined as the day of presentation at hospital or the day before).
+
+```{r}
+# Create a matrix with the data
+Data <- matrix(c(85, 27,    # Food poisoning cases (Ate, Did Not Eat)
+                 108, 64),  # No food poisoning (Controls) (Ate, Did Not Eat)
+               nrow = 2, byrow = TRUE)
+
+# Add row and column names
+rownames(Data) <- c("Food Poisoning (Cases)", "No Food Poisoning (Controls)")
+colnames(Data) <- c("Ate at Restaurant", "Did Not Eat at Restaurant")
+
+# Convert to a contingency table
+contingency_table <- as.table(Data)
+
+# View the table
+print(contingency_table)
+
+# Optional: Add row and column totals
+row_totals <- rowSums(Data)
+col_totals <- colSums(Data)
+Data_with_totals <- rbind(cbind(Data, row_totals), c(col_totals, sum(Data)))
+
+# Add names to the table with totals
+rownames(Data_with_totals) <- c("Food Poisoning (Cases)", "No Food Poisoning (Controls)", "Total")
+colnames(Data_with_totals) <- c("Ate at Restaurant", "Did Not Eat at Restaurant", "Total")
+
+# Convert to a table with totals
+contingency_table_with_totals <- as.table(Data_with_totals)
+
+# View the table with totals
+print(contingency_table_with_totals)
+
+
+```
+#There were 172 patient who were not diagnosed with food poisoning (controls) and 112 patients diagnosed with food poisoning (cases) enrolled into the study. 108 controls had eaten out at a restaurant, while 85 cases had eaten out at a restaurant within the past 2 days (defined as the day of presentation at hospital or the day before).
+```{r}
+# contigency table.
+
+total_control <- 172
+total_cases <- 112
+Exposed_not_diseased <- 108
+Exposed_diseased <- 85
+Not_exposed_diseased <- 112-85 
+Not_exposed_not_diseased<- 172-108
+
+Data_2 <- matrix(c(Exposed_diseased,Exposed_not_diseased,
+                 Not_exposed_diseased,Not_exposed_not_diseased), nrow=2, byrow = TRUE)
+# ROW AND COLUMN NAMES
+
+rownames(Data_2) <- c("Ate_at_Restraunt","Not_eat_Restraunt")
+colnames(Data_2) <- c("Food_poisoining", "No_Food_poisonng")
+
+Data_2_total <- rbind(cbind(Data_2,rowSums(Data_2)),c(colSums(Data_2),248))
+
+#add the names of the total column
+rownames(Data_2_total)[3] <- "Total"
+colnames(Data_2_total)[3] <- "Total"
+
+contigency_tableT<- Data_2_total
+
+contigency_tableT
+```
+#Calculate:
+
+#the risk of a patient having food poisoning
+#the risk of a patient eating out at a restaurant AND having food poisoning
+#the risk of a patient not eating out at a restaurant AND having food poisoning
+
+```{r}
+
+#the risk of a patient having food poisoning
+
+total_popn<- 248
+total_ate_Restraunt <-193
+total_not_Restraunt<-91
+
+attack_rate <- total_cases/total_popn
+
+
+
+Risk_disease <- Exposed_diseased/total_ate_Restraunt
+
+Risk_Not__exposed_disease <- Not_exposed_diseased /total_not_Restraunt
+
+
+RR <- Risk_disease/Risk_Not__exposed_disease
+
+Odds_exposed <- Risk_disease/(1-Risk_disease)
+
+Odds_unexposed <-Risk_Not__exposed_disease/(1-Risk_Not__exposed_disease)
+
+OR<- Odds_exposed/Odds_unexposed
+
+attack_rate
+Risk_disease
+Risk_Not__exposed_disease
+RR
+OR
+```
+
+```{r}
+#Import Data
+
+scs <- read.csv("C:/Users/aneke/Downloads/Surveillance practice/Social Contact.csv", na.strings = c("NA","-"))
+
+```
+
+```{r}
+#explore the data structure
+
+str(scs)
+head(scs)
+tail(scs)
+```
+
+
+```{r}
+#Transformation of variables
+
+scs$date <- as.POSIXct(scs$date, tryFormats = c("%d/%m/%Y %H:%M", "%d/%m/%Y", "%Y-%m-%d"))
+
+scs$sex <- factor(scs$sex, levels = c(1,0,-1), labels = c("Male", "Female","Unspecify"))
+
+scs$age <- as.numeric(scs$age)
+
+scs$age_group <- cut(scs$age,
+               breaks = c(0,5,10,15,20,25,30,35,40,
+                          45,50,55,60,65,70,75,80,85,
+                          90, Inf),
+               labels = c("0-4","5-9","10-14","15-19","20-24",
+                          "25-29","30-34", "35-39","40-44","45-49",
+                          "50-54","55-59","60-64","65-69","70-74","75-79",
+                          "80-84","85-89","90+"),right = FALSE)
+scs$day_of_week <- factor(scs$day_of_week,
+                          levels = c(0:6),
+                          labels = c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"))
+ scs$household_size[scs$household_size == -1] <- NA
+
+scs$household_size <- cut(scs$household_size,
+                          breaks = c(0, 1,4,6,8,Inf),
+                          labels = c("1_Person","2-4persons","5-6persons","7-8persons",">8persons"))
+
+scs$occupation <- as.factor(scs$occupation)
+
+scs$postcode <- as.factor(scs$postcode)
+
+scs$postal <- factor(scs$postal, levels = c(1,0), labels = c("yes", "no"))
+
+scs$web <- factor(scs$web, levels = c(1,0), labels = c("yes", "no"))
+
+scs$survey_type <- ifelse(scs$postal== "yes", "postal",
+                          ifelse(scs$web == "yes", "web", "unknown"))
+
+
+scs$survey_type<- as.factor(scs$survey_type)
+
+```
+
+
+```{r}
+
+# check for duplicates
+
+duplicate_enteries <- duplicated(scs$id)
+
+
+sum(duplicate_enteries)
+
+sum(is.na(scs$date))
+
+
+```
+#Handling missing values
+```{r}
+
+library(naniar)
+
+vis_miss(scs)
+
+gg_miss_var(scs, show_pct = TRUE)
+
+n_miss(scs)
+
+n_complete(scs)
+
+miss_var_summary(scs)
+
+```
+```{r}
+# pattern of missingness
+
+library(VIM)
+
+matrixplot(scs)
+```
+
+```{r}
+
+```
+```{r}
+#Descriptive statistics
+
+
+table(scs$sex)
+
+summary(scs$age)
+
+# age distribution
+
+Age_Dist<- ggplot(scs,aes(x=age))+
+  geom_histogram(binwidth = 5, fill= "steelblue", color="white", aes(y= ..density..))+
+  geom_density(color="red",size= 1.2)
+  labs(title = "Age Dstribution",
+       x= "Age",
+       y = "density")
+
+# barplot of sex distribution
+
+Gender <- ggplot(scs,aes(x=sex)) +
+                   geom_bar(fill= "steelblue", width = 0.5)+
+                   labs(title = "Sex Distribution", x= "sex", y="count")
+
+age_group <- ggplot(scs, aes(x= age_group))+
+   geom_bar(fill= "steelblue", width = 0.5)+
+                   labs(title = "Age_group Distribution", x= "age_group", y="count")
+
+Age_Dist
+Gender
+age_group
+
+
+
+```
+
+```{r}
+age <- scs %>%
+  group_by(age_group, sex) %>%
+  summarise(count = n())%>%
+  #group_by(age_group) %>%
+  mutate(proportion = round((count / sum(count))*100,2))
+
+age
+knitr::kable(age, caption = "age group and sex proportion")
+
+Gender <- scs %>%
+  group_by(sex) %>%
+  summarise(count = n())%>%
+  mutate(proportion = round((count / sum(count))*100, 2))
+
+Gender
+
+knitr::kable(Gender, caption = "Gender proportion")
+
+
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+#Data representative nature
+
+Census<- read.csv("C:/Users/aneke/Downloads/Surveillance practice/Census.csv")
+
+Census$Age[2]<- "5-9"
+```
+
+
+```{r}
+# Create a summary table of counts by age group and sex
+age_sex_summary <- scs %>%
+  group_by(age_group, sex) %>%
+  summarise(count = n())
+
+# Reverse the counts for males to make a pyramid
+age_sex_summary <- age_sex_summary %>%
+  mutate(count = ifelse(sex == "Male", -count, count))
+
+# Plot the population pyramid
+ggplot(age_sex_summary, aes(x = age_group, y = count, fill = sex)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  coord_flip() +  # Flip coordinates to create a horizontal pyramid
+  scale_y_continuous(labels = abs) +  # Show positive values on both sides
+  labs(title = "Population Pyramid", x = "Age Group", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Male" = "blue", "Female" = "pink")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# Make sure Males have negative values for the population pyramid
+census_data <- Census %>%
+  mutate(Males = -Males)
+
+# Assuming `scs` is your dataset with 'age_group' and 'sex' columns
+scs$sex <- factor(scs$sex, levels = c(0, 1), labels = c("Male", "Female"))
+
+# Summarize your data by age group and sex
+scs_summary <- scs %>%
+  group_by(age_group, sex) %>%
+  summarise(count = n()) %>%
+  ungroup()
+
+# Make Male counts negative for population pyramid
+scs_summary <- scs_summary %>%
+  mutate(count = ifelse(sex == "Male", -count, count))
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+
+
